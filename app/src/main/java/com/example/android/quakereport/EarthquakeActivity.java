@@ -18,7 +18,6 @@ package com.example.android.quakereport;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.AsyncTask;
 import android.app.LoaderManager;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Loader;
@@ -38,7 +37,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EarthquakeActivity extends AppCompatActivity {
+public class EarthquakeActivity extends AppCompatActivity implements LoaderCallbacks<List<Earthquake>>{
 
     public static final String LOG_TAG = EarthquakeActivity.class.getName();
     public static final String USGS_REQUEST = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&starttime=2016-01-01&endtime=2016-05-02&minfelt=50&minmagnitude=5";
@@ -49,12 +48,6 @@ public class EarthquakeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.earthquake_activity);
-
-        //Execute network request on a background thread
-        //LoaderManager loaderManager = getLoaderManager();
-        //loaderManager.initLoader(EARTHQUAKE_LOADER_ID,null,this);
-        EarthquakeAsyncTask task = new EarthquakeAsyncTask();
-        task.execute();
 
         ListView earthquakeListView = (ListView) findViewById(R.id.list);
 
@@ -83,46 +76,28 @@ public class EarthquakeActivity extends AppCompatActivity {
                 startActivity(websiteIntent);
             }
         });
+
+        LoaderManager loaderManager = getLoaderManager();
+        loaderManager.initLoader(EARTHQUAKE_LOADER_ID,null,this);
     }
 
-       
-
-
-    protected void updateUI(List<Earthquake> earthquakes){
-        adapter.addAll(earthquakes);
-
+    public Loader<List<Earthquake>> onCreateLoader(int i,Bundle bundle){
+        adapter.clear();
+        return new EarthquakeLoader(this, USGS_REQUEST);
     }
 
-    private class EarthquakeAsyncTask extends AsyncTask<URL, Void, List<Earthquake>> {
-        @Override
-        protected List<Earthquake> doInBackground(URL... urls) {
-            String jsonResponse = "";
-            //Create URL using the query string USGS_REQUEST
-            URL url = createURL(USGS_REQUEST);
-
-            if(url == null)
-                return null;
-
-            //Obtain a response from the server and convert it into string
-            try{
-                jsonResponse = makeHttpRequest(url);
-            }
-            catch(IOException e){
-                e.printStackTrace();
-            }
-            //return list of earthquakes using the string jsonResponse
-            return QueryUtils.extractEarthquakes(jsonResponse);
-
-        }
-
-        @Override
-        protected void onPostExecute(List<Earthquake> earthquakes){
-            adapter.clear();
-            if(earthquakes != null && !earthquakes.isEmpty())
-                updateUI(earthquakes);
-        }
+    public void onLoadFinished(Loader<List<Earthquake>> loader,List<Earthquake> earthquakes){
+        adapter.clear();
+        if(earthquakes != null && !earthquakes.isEmpty())
+            updateUI(earthquakes);
     }
-    protected URL createURL(String request){
+
+    public void onLoaderReset(Loader<List<Earthquake>> loader){
+        adapter.clear();
+    }
+
+
+    protected static URL createURL(String request){
         URL url = null;
         //Create URL
         try{
@@ -133,7 +108,8 @@ public class EarthquakeActivity extends AppCompatActivity {
         }
         return url;
     }
-    protected String makeHttpRequest(URL url) throws IOException{
+
+    protected static String makeHttpRequest(URL url) throws IOException{
 
         String jsonResponse = "";
         if(url == null)
@@ -162,7 +138,8 @@ public class EarthquakeActivity extends AppCompatActivity {
 
         return jsonResponse;
     }
-    private String readFromStream(InputStream inputStream) throws IOException {
+
+    protected static String readFromStream(InputStream inputStream) throws IOException {
         StringBuilder output = new StringBuilder();
         if (inputStream != null) {
             InputStreamReader inputStreamReader = new InputStreamReader(inputStream, Charset.forName("UTF-8"));
@@ -174,5 +151,9 @@ public class EarthquakeActivity extends AppCompatActivity {
             }
         }
         return output.toString();
+    }
+
+    protected void updateUI(List<Earthquake> earthquakes){
+        adapter.addAll(earthquakes);
     }
 }
