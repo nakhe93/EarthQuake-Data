@@ -19,8 +19,10 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.app.LoaderManager;
+import android.app.LoaderManager.LoaderCallbacks;
+import android.content.Loader;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -34,35 +36,24 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.List;
 
 public class EarthquakeActivity extends AppCompatActivity {
 
     public static final String LOG_TAG = EarthquakeActivity.class.getName();
     public static final String USGS_REQUEST = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&starttime=2016-01-01&endtime=2016-05-02&minfelt=50&minmagnitude=5";
-
+    private EarthquakeAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.earthquake_activity);
 
-        //Perform network operation on a different thread.
-        EarthquakeAsyncTask task = new EarthquakeAsyncTask();
-        task.execute();
-
-
-        //ArrayList<Earthquake> earthquakes = QueryUtils.extractEarthquakes(jsonResponse);
-
-       
-    }
-
-    protected void updateUI(String jsonResponse){
-        ArrayList<Earthquake> earthquakes = QueryUtils.extractEarthquakes(jsonResponse);
 
         ListView earthquakeListView = (ListView) findViewById(R.id.list);
 
         // Create a new adapter that takes the list of earthquakes as input
-        final EarthquakeAdapter adapter = new EarthquakeAdapter(this, earthquakes);
+        adapter = new EarthquakeAdapter(this, new ArrayList<Earthquake>());
 
         // Set the adapter on the {@link ListView}
         // so the list can be populated in the user interface
@@ -86,17 +77,24 @@ public class EarthquakeActivity extends AppCompatActivity {
                 startActivity(websiteIntent);
             }
         });
+
+       
     }
 
-    private class EarthquakeAsyncTask extends AsyncTask<URL, Void, String> {
+    protected void updateUI(List<Earthquake> earthquakes){
+        adapter.addAll(earthquakes);
+
+    }
+
+    private class EarthquakeAsyncTask extends AsyncTask<URL, Void, List<Earthquake>> {
         @Override
-        protected String doInBackground(URL... urls) {
+        protected List<Earthquake> doInBackground(URL... urls) {
             String jsonResponse = "";
             //Create URL using the query string USGS_REQUEST
             URL url = createURL(USGS_REQUEST);
 
             if(url == null)
-                return jsonResponse;
+                return null;
 
             //Obtain a response from the server and convert it into string
             try{
@@ -105,14 +103,16 @@ public class EarthquakeActivity extends AppCompatActivity {
             catch(IOException e){
                 e.printStackTrace();
             }
-            return jsonResponse;
+            //return list of earthquakes using the string jsonResponse
+            return QueryUtils.extractEarthquakes(jsonResponse);
 
         }
 
         @Override
-        protected void onPostExecute(String jsonResponse){
-
-            updateUI(jsonResponse);
+        protected void onPostExecute(List<Earthquake> earthquakes){
+            adapter.clear();
+            if(earthquakes != null && !earthquakes.isEmpty())
+                updateUI(earthquakes);
         }
 
         protected URL createURL(String request){
