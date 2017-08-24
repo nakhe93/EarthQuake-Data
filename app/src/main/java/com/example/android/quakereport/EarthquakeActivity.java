@@ -49,6 +49,10 @@ public class EarthquakeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.earthquake_activity);
 
+        //Execute network request on a background thread
+        EarthquakeAsyncTask task = new EarthquakeAsyncTask();
+        task.execute();
+
 
         ListView earthquakeListView = (ListView) findViewById(R.id.list);
 
@@ -77,9 +81,10 @@ public class EarthquakeActivity extends AppCompatActivity {
                 startActivity(websiteIntent);
             }
         });
+    }
 
        
-    }
+
 
     protected void updateUI(List<Earthquake> earthquakes){
         adapter.addAll(earthquakes);
