@@ -17,8 +17,8 @@ package com.example.android.quakereport;
 
 import android.content.Intent;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.AsyncTask;
 import android.app.LoaderManager;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Loader;
@@ -42,6 +42,7 @@ public class EarthquakeActivity extends AppCompatActivity {
 
     public static final String LOG_TAG = EarthquakeActivity.class.getName();
     public static final String USGS_REQUEST = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&starttime=2016-01-01&endtime=2016-05-02&minfelt=50&minmagnitude=5";
+    public static final int EARTHQUAKE_LOADER_ID = 1;
     private EarthquakeAdapter adapter;
 
     @Override
@@ -50,9 +51,10 @@ public class EarthquakeActivity extends AppCompatActivity {
         setContentView(R.layout.earthquake_activity);
 
         //Execute network request on a background thread
+        //LoaderManager loaderManager = getLoaderManager();
+        //loaderManager.initLoader(EARTHQUAKE_LOADER_ID,null,this);
         EarthquakeAsyncTask task = new EarthquakeAsyncTask();
         task.execute();
-
 
         ListView earthquakeListView = (ListView) findViewById(R.id.list);
 
@@ -119,61 +121,58 @@ public class EarthquakeActivity extends AppCompatActivity {
             if(earthquakes != null && !earthquakes.isEmpty())
                 updateUI(earthquakes);
         }
-
-        protected URL createURL(String request){
-            URL url = null;
-            //Create URL
-            try{
-                url = new URL(request);
-            }
-            catch(MalformedURLException m){
-                m.printStackTrace();
-            }
-            return url;
+    }
+    protected URL createURL(String request){
+        URL url = null;
+        //Create URL
+        try{
+            url = new URL(request);
         }
+        catch(MalformedURLException m){
+            m.printStackTrace();
+        }
+        return url;
+    }
+    protected String makeHttpRequest(URL url) throws IOException{
 
-        protected String makeHttpRequest(URL url) throws IOException{
-
-            String jsonResponse = "";
-            if(url == null)
-                return jsonResponse;
-
-            HttpURLConnection connection = null;
-            InputStream inputStream = null;
-
-            //Make HTTP connection with the URL given in argument
-            //and store the data received from server in a string
-            try{
-                connection = (HttpURLConnection)url.openConnection();
-                connection.setRequestMethod("GET");
-                connection.setConnectTimeout(10000);
-                connection.setReadTimeout(15000);
-                connection.connect();
-                inputStream = connection.getInputStream();
-                jsonResponse = readFromStream(inputStream);
-            }
-            finally {
-                if(connection != null)
-                    connection.disconnect();
-                if(inputStream != null)
-                    inputStream.close();
-            }
-
+        String jsonResponse = "";
+        if(url == null)
             return jsonResponse;
+
+        HttpURLConnection connection = null;
+        InputStream inputStream = null;
+
+        //Make HTTP connection with the URL given in argument
+        //and store the data received from server in a string
+        try{
+            connection = (HttpURLConnection)url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setConnectTimeout(10000);
+            connection.setReadTimeout(15000);
+            connection.connect();
+            inputStream = connection.getInputStream();
+            jsonResponse = readFromStream(inputStream);
+        }
+        finally {
+            if(connection != null)
+                connection.disconnect();
+            if(inputStream != null)
+                inputStream.close();
         }
 
-        private String readFromStream(InputStream inputStream) throws IOException {
-            StringBuilder output = new StringBuilder();
-            if (inputStream != null) {
-                InputStreamReader inputStreamReader = new InputStreamReader(inputStream, Charset.forName("UTF-8"));
-                BufferedReader reader = new BufferedReader(inputStreamReader);
-                String line = reader.readLine();
-                while (line != null) {
-                    output.append(line);
-                    line = reader.readLine();
-                }
+        return jsonResponse;
+    }
+    private String readFromStream(InputStream inputStream) throws IOException {
+        StringBuilder output = new StringBuilder();
+        if (inputStream != null) {
+            InputStreamReader inputStreamReader = new InputStreamReader(inputStream, Charset.forName("UTF-8"));
+            BufferedReader reader = new BufferedReader(inputStreamReader);
+            String line = reader.readLine();
+            while (line != null) {
+                output.append(line);
+                line = reader.readLine();
             }
-            return output.toString();
         }
+        return output.toString();
     }
 }
