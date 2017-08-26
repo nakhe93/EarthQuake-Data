@@ -26,6 +26,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import java.io.BufferedReader;
@@ -41,16 +42,19 @@ import java.util.List;
 
 public class EarthquakeActivity extends AppCompatActivity implements LoaderCallbacks<List<Earthquake>>{
 
-    public static final String LOG_TAG = EarthquakeActivity.class.getName();
     public static final String USGS_REQUEST = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&starttime=2016-01-01&endtime=2016-05-02&minfelt=50&minmagnitude=5";
     public static final int EARTHQUAKE_LOADER_ID = 1;
     private EarthquakeAdapter adapter;
     private TextView emptyEarthquakeView;
-
+    private ProgressBar loadingSpinner;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.earthquake_activity);
+
+        //Setting the loading spinner and displaying it
+        loadingSpinner = (ProgressBar) findViewById(R.id.loading_spinner);
+        loadingSpinner.setVisibility(View.VISIBLE);
 
         //Create emptyView in case no search results are found
         emptyEarthquakeView = (TextView) findViewById(R.id.empty_view);
@@ -64,6 +68,7 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderCallb
         // so the list can be populated in the user interface
         earthquakeListView.setAdapter(adapter);
         earthquakeListView.setEmptyView(emptyEarthquakeView);
+
 
         // Set an item click listener on the ListView, which sends an intent to a web browser
         // to open a website with more information about the selected earthquake.
@@ -98,6 +103,8 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderCallb
 
     public void onLoadFinished(Loader<List<Earthquake>> loader,List<Earthquake> earthquakes){
 
+        //Removing the loading spinner as the network request has completed
+        loadingSpinner.setVisibility(View.GONE);
         //Log.d("onLoadFinished","onLoadFinished called");
 
         //Set the message to be displayed when no earthquake is found for the user query
