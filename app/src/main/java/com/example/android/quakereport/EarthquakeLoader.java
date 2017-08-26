@@ -3,6 +3,7 @@ package com.example.android.quakereport;
 import android.content.AsyncTaskLoader;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -24,21 +25,26 @@ public class EarthquakeLoader extends AsyncTaskLoader<List<Earthquake>> {
     public EarthquakeLoader(Context context, String url){
         super(context);
         this.earthquakeUrl = url;
+        //Log.d("earthquakel constructor","earthquakel constructor");
     }
 
     protected void onStartLoading(){
         forceLoad();
+        //Log.d("onstartloading","onstatrtloading cqalled");
     }
 
     public List<Earthquake> loadInBackground(){
         if(earthquakeUrl == null)
             return null;
 
+        //Log.d("loadiinbackground ","loadibackground ");
+
         String jsonResponse = "";
         //Create URL using the query string USGS_REQUEST
         URL url = EarthquakeActivity.createURL(earthquakeUrl);
 
         try{
+            //Query API with the created URL and store the result in string
             jsonResponse = EarthquakeActivity.makeHttpRequest(url);
         }
         catch(IOException e){
@@ -47,62 +53,4 @@ public class EarthquakeLoader extends AsyncTaskLoader<List<Earthquake>> {
         //return list of earthquakes using the string jsonResponse
         return QueryUtils.extractEarthquakes(jsonResponse);
     }
-/*
-    protected URL createURL(String request){
-        URL url = null;
-        //Create URL
-        try{
-            url = new URL(request);
-        }
-        catch(MalformedURLException m){
-            m.printStackTrace();
-        }
-        return url;
-    }
-
-    protected String makeHttpRequest(URL url) throws IOException{
-
-        String jsonResponse = "";
-        if(url == null)
-            return jsonResponse;
-
-        HttpURLConnection connection = null;
-        InputStream inputStream = null;
-
-        //Make HTTP connection with the URL given in argument
-        //and store the data received from server in a string
-        try{
-            connection = (HttpURLConnection)url.openConnection();
-            connection.setRequestMethod("GET");
-            connection.setConnectTimeout(10000);
-            connection.setReadTimeout(15000);
-            connection.connect();
-            inputStream = connection.getInputStream();
-            jsonResponse = readFromStream(inputStream);
-        }
-        finally {
-            if(connection != null)
-                connection.disconnect();
-            if(inputStream != null)
-                inputStream.close();
-        }
-
-        return jsonResponse;
-    }
-
-    private String readFromStream(InputStream inputStream) throws IOException {
-        StringBuilder output = new StringBuilder();
-        if (inputStream != null) {
-            InputStreamReader inputStreamReader = new InputStreamReader(inputStream, Charset.forName("UTF-8"));
-            BufferedReader reader = new BufferedReader(inputStreamReader);
-            String line = reader.readLine();
-            while (line != null) {
-                output.append(line);
-                line = reader.readLine();
-            }
-        }
-        return output.toString();
-    }
-
-*/
 }

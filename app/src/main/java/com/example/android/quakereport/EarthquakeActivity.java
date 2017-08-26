@@ -22,9 +22,11 @@ import android.app.LoaderManager;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Loader;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -43,11 +45,15 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderCallb
     public static final String USGS_REQUEST = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&starttime=2016-01-01&endtime=2016-05-02&minfelt=50&minmagnitude=5";
     public static final int EARTHQUAKE_LOADER_ID = 1;
     private EarthquakeAdapter adapter;
+    private TextView emptyEarthquakeView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.earthquake_activity);
+
+        //Create emptyView in case no search results are found
+        emptyEarthquakeView = (TextView) findViewById(R.id.empty_view);
 
         ListView earthquakeListView = (ListView) findViewById(R.id.list);
 
@@ -57,6 +63,7 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderCallb
         // Set the adapter on the {@link ListView}
         // so the list can be populated in the user interface
         earthquakeListView.setAdapter(adapter);
+        earthquakeListView.setEmptyView(emptyEarthquakeView);
 
         // Set an item click listener on the ListView, which sends an intent to a web browser
         // to open a website with more information about the selected earthquake.
@@ -77,23 +84,34 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderCallb
             }
         });
 
+        //Initialize loader manager
         LoaderManager loaderManager = getLoaderManager();
         loaderManager.initLoader(EARTHQUAKE_LOADER_ID,null,this);
+        //Log.d("initLoader","initLoader called");
     }
 
     public Loader<List<Earthquake>> onCreateLoader(int i,Bundle bundle){
         adapter.clear();
+        //Log.d("CreateLoader","onCreateLoader called");
         return new EarthquakeLoader(this, USGS_REQUEST);
     }
 
     public void onLoadFinished(Loader<List<Earthquake>> loader,List<Earthquake> earthquakes){
+
+        //Log.d("onLoadFinished","onLoadFinished called");
+
+        //Set the message to be displayed when no earthquake is found for the user query
+        emptyEarthquakeView.setText(R.string.no_earthquake);
         adapter.clear();
+
+        //Update UI with the list of earthquakes received
         if(earthquakes != null && !earthquakes.isEmpty())
             updateUI(earthquakes);
     }
 
     public void onLoaderReset(Loader<List<Earthquake>> loader){
         adapter.clear();
+        //Log.d("onLodaerREset","onloaderReset called");
     }
 
 
