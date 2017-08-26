@@ -15,7 +15,10 @@
  */
 package com.example.android.quakereport;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.LoaderManager;
@@ -89,10 +92,23 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderCallb
             }
         });
 
-        //Initialize loader manager
-        LoaderManager loaderManager = getLoaderManager();
-        loaderManager.initLoader(EARTHQUAKE_LOADER_ID,null,this);
-        //Log.d("initLoader","initLoader called");
+        //If Device is connected to internet then query the API
+        if(isNetworkConnected()){
+            //Initialize loader manager
+            LoaderManager loaderManager = getLoaderManager();
+            loaderManager.initLoader(EARTHQUAKE_LOADER_ID,null,this);
+
+            //Log.d("initLoader","initLoader called");
+        }
+
+        //Device is not connected to internet
+        else{
+            //Disable the loading spinner
+            loadingSpinner.setVisibility(View.GONE);
+            //Set the message to be displayed
+            emptyEarthquakeView.setText(R.string.no_internet_connection);
+        }
+
     }
 
     public Loader<List<Earthquake>> onCreateLoader(int i,Bundle bundle){
@@ -180,5 +196,15 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderCallb
 
     protected void updateUI(List<Earthquake> earthquakes){
         adapter.addAll(earthquakes);
+    }
+
+    //Method to check whether the device is connected to internet or not
+    protected boolean isNetworkConnected(){
+        ConnectivityManager cm =
+                (ConnectivityManager)this.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        return(activeNetwork != null &&
+                activeNetwork.isConnectedOrConnecting());
     }
 }
