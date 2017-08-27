@@ -26,4 +26,16 @@
 
     <!-- Message to be displayed when device is not connected to internet -->
     <string name="no_internet_connection">No Internet Connection</string>
+
+    <!-- Label for selection of minimum magnitude of earthquake -->
+    <string name="settings_min_magnitude_label">Minimum Magnitude</string>
+    <string name="settings_min_magnitude_key" translatable="false">min_magnitude</string>
+    <string name="settings_min_magnitude_default" translatable="false">6</string>
+
+    <!-- Label for selection of maximum magnitude of earthquake -->
+    <string name="settings_max_magnitude_label">Maximum Magnitude</string>
+    <string name="settings_max_magnitude_key" translatable="false">max_magnitude</string>
+    <string name="settings_max_magnitude_default" translatable="false">9</string>
+
+    <string name="settings_title">Set Search Parameters</string>
 </resources>
