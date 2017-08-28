@@ -30,7 +30,12 @@
             </intent-filter>
         </activity>
         <activity android:name=".SettingsActivity"
-                  android:label="Search Settings">
+                  android:label="Search Settings"
+                  android:parentActivityName=".EarthquakeActivity">
+                  <meta-data
+                      android:name="android.support.PARENT_ACTIVITY"
+                      android:value=".EarthquakeActivity"/>
+
         </activity>
     </application>
 
