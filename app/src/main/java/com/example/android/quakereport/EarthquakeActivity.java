@@ -17,6 +17,7 @@ package com.example.android.quakereport;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -24,6 +25,7 @@ import android.os.Bundle;
 import android.app.LoaderManager;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Loader;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -47,7 +49,7 @@ import java.util.List;
 
 public class EarthquakeActivity extends AppCompatActivity implements LoaderCallbacks<List<Earthquake>>{
 
-    public static final String USGS_REQUEST = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&starttime=2016-01-01&endtime=2016-05-02&minfelt=50&minmagnitude=5";
+    public static final String USGS_REQUEST = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&starttime=2016-01-01&endtime=2016-05-02&minfelt=50";
     public static final int EARTHQUAKE_LOADER_ID = 1;
     private EarthquakeAdapter adapter;
     private TextView emptyEarthquakeView;
@@ -115,8 +117,32 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderCallb
 
     public Loader<List<Earthquake>> onCreateLoader(int i,Bundle bundle){
         adapter.clear();
-        //Log.d("CreateLoader","onCreateLoader called");
-        return new EarthquakeLoader(this, USGS_REQUEST);
+
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+        //Read the preference corresponding to min_magnitude
+        String minMagnitude = sharedPrefs.getString(
+                getString(R.string.settings_min_magnitude_key),
+                getString(R.string.settings_min_magnitude_default));
+
+        //Read the preference corresponding to max_magnitude
+        String maxMagnitude = sharedPrefs.getString(
+                getString(R.string.settings_max_magnitude_key),
+                getString(R.string.settings_max_magnitude_default));
+
+        //Base URL
+        Uri baseUri = Uri.parse(USGS_REQUEST);
+        Uri.Builder uriBuilder = baseUri.buildUpon();
+
+        uriBuilder.appendQueryParameter("format", "geojson");
+        uriBuilder.appendQueryParameter("starttime", "2016-01-01");
+        uriBuilder.appendQueryParameter("endtime", "2016-05-02");
+        uriBuilder.appendQueryParameter("minfelt", "50");
+        //Build the URL using the min and max magnitude parameters specified in default value
+        uriBuilder.appendQueryParameter("minmag", minMagnitude);
+        uriBuilder.appendQueryParameter("maxmag", maxMagnitude);
+        //uriBuilder.appendQueryParameter("orderby", "time");
+        Log.d("URL",uriBuilder.toString());
+        return new EarthquakeLoader(this, uriBuilder.toString());
     }
 
     public void onLoadFinished(Loader<List<Earthquake>> loader,List<Earthquake> earthquakes){

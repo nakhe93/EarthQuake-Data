@@ -15,4 +15,5 @@
         android:key="@string/settings_max_magnitude_key"
         android:selectAllOnFocus="true"
         android:title="@string/settings_max_magnitude_label" />
+
 </PreferenceScreen>

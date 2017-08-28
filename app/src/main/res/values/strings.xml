@@ -30,12 +30,22 @@
     <!-- Label for selection of minimum magnitude of earthquake -->
     <string name="settings_min_magnitude_label">Minimum Magnitude</string>
     <string name="settings_min_magnitude_key" translatable="false">min_magnitude</string>
-    <string name="settings_min_magnitude_default" translatable="false">6</string>
+    <string name="settings_min_magnitude_default" translatable="false">5</string>
 
     <!-- Label for selection of maximum magnitude of earthquake -->
     <string name="settings_max_magnitude_label">Maximum Magnitude</string>
     <string name="settings_max_magnitude_key" translatable="false">max_magnitude</string>
     <string name="settings_max_magnitude_default" translatable="false">9</string>
+
+    <!-- Label for selection of minimum date of earthquake -->
+    <string name="settings_min_date_label">Minimum Date</string>
+    <string name="settings_min_date_key" translatable="false">min_date</string>
+
+
+    <!-- Label for selection of maximum date of earthquake -->
+    <string name="settings_max_date_label">Maximum Date</string>
+    <string name="settings_max_date_key" translatable="false">max_date</string>
+
 
     <string name="settings_title">Set Search Parameters</string>
 </resources>
