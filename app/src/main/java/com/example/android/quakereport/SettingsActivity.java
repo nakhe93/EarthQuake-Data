@@ -1,14 +1,21 @@
 package com.example.android.quakereport;
 
 import android.app.Activity;
+import android.app.DatePickerDialog;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.view.View;
+import android.widget.DatePicker;
+
+import java.util.Calendar;
 
 
 /**
@@ -25,8 +32,9 @@ public class SettingsActivity extends AppCompatActivity {
         actionBar.setDisplayHomeAsUpEnabled(true);
     }
 
-    public static class EarthquakePreferenceFragment extends PreferenceFragment implements Preference.OnPreferenceChangeListener{
-
+    public static class EarthquakePreferenceFragment extends PreferenceFragment implements Preference.OnPreferenceChangeListener,Preference.OnPreferenceClickListener{
+        EditTextPreference end;
+        Preference endDate;
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.settings_main);
@@ -35,10 +43,12 @@ public class SettingsActivity extends AppCompatActivity {
             Preference maxMagnitude = findPreference(getString(R.string.settings_max_magnitude_key));
             Preference orderBy = findPreference(getString(R.string.settings_order_by_key));
             Preference startDate = findPreference("start_date");
-            Preference endDate = findPreference("end_date");
+            endDate = findPreference("end_date");
+
+            endDate.setOnPreferenceClickListener(this);
 
             bindPreferenceSummaryToValue(startDate);
-            bindPreferenceSummaryToValue(endDate);
+
             bindPreferenceSummaryToValue(orderBy);
             bindPreferenceSummaryToValue(minMagnitude);
             bindPreferenceSummaryToValue(maxMagnitude);
@@ -56,10 +66,46 @@ public class SettingsActivity extends AppCompatActivity {
                     preference.setSummary(labels[prefIndex]);
                 }
             }
-            else{
+            else {
                 preference.setSummary(stringValue);
             }
+            return true;
+        }
 
+
+        public boolean onPreferenceClick(Preference preference){
+            View v = getView();
+            int mYear,mMonth,mDay;
+            int setDay;
+            end = (EditTextPreference) findPreference("end_date");
+            if(preference == end) {
+
+                // Get Current Date
+                final Calendar c = Calendar.getInstance();
+                mYear = c.get(Calendar.YEAR);
+                mMonth = c.get(Calendar.MONTH);
+                mDay = c.get(Calendar.DAY_OF_MONTH);
+
+                Log.d("endddate","suceess");
+                DatePickerDialog datePickerDialog = new DatePickerDialog(v.getContext(),
+                        new DatePickerDialog.OnDateSetListener() {
+
+                            @Override
+                            public void onDateSet(DatePicker view, int year,
+                                                  int monthOfYear, int dayOfMonth) {
+
+                                Log.d("dateup","suceess");
+                                end.setText(year + "-" + (monthOfYear + 1) + "-" + dayOfMonth);
+                                int setYear = year;
+                                int setMonth = monthOfYear + 1;
+                                int setDay = dayOfMonth;
+                                Log.d("fin",String.valueOf(setDay));
+                                bindPreferenceSummaryToValue(endDate);
+                            }
+                        }, mYear, mMonth, mDay);
+                datePickerDialog.show();
+
+            }
             return true;
         }
 
@@ -71,3 +117,4 @@ public class SettingsActivity extends AppCompatActivity {
         }
     }
 }
+

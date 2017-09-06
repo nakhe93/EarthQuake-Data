@@ -26,14 +26,13 @@
 
     <EditTextPreference
         android:defaultValue="2016-01-01"
-        android:inputType="none"
+        android:inputType="text"
         android:key="start_date"
         android:selectAllOnFocus="true"
         android:title="@string/start_date" />
 
     <EditTextPreference
         android:defaultValue="2016-05-02"
-        android:inputType="none"
         android:key="end_date"
         android:selectAllOnFocus="true"
         android:title="@string/end_date" />
