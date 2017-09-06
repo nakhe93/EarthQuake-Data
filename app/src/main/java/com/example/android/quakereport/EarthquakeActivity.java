@@ -129,6 +129,12 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderCallb
                 getString(R.string.settings_max_magnitude_key),
                 getString(R.string.settings_max_magnitude_default));
 
+        //Read the preference corresponding to start date
+        String startDate = sharedPrefs.getString("start_date","2016-01-01");
+
+        //Read the preference corresponding to end date
+        String endDate = sharedPrefs.getString("end_date","2016-05-02");
+
         //Read the preference for arranging results in specific order
         String orderBy = sharedPrefs.getString(
                 getString(R.string.settings_order_by_key),
@@ -139,11 +145,12 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderCallb
         Uri baseUri = Uri.parse(USGS_REQUEST);
         Uri.Builder uriBuilder = baseUri.buildUpon();
 
+        //Build the URL using the parameters specified in settings
         uriBuilder.appendQueryParameter("format", "geojson");
-        uriBuilder.appendQueryParameter("starttime", "2016-01-01");
-        uriBuilder.appendQueryParameter("endtime", "2016-05-02");
+        uriBuilder.appendQueryParameter("starttime", startDate);
+        uriBuilder.appendQueryParameter("endtime", endDate);
         uriBuilder.appendQueryParameter("minfelt", "50");
-        //Build the URL using the min and max magnitude parameters specified in default value
+
         uriBuilder.appendQueryParameter("minmag", minMagnitude);
         uriBuilder.appendQueryParameter("maxmag", maxMagnitude);
         uriBuilder.appendQueryParameter("orderby", orderBy);

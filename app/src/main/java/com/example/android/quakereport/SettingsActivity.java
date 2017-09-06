@@ -34,6 +34,11 @@ public class SettingsActivity extends AppCompatActivity {
             Preference minMagnitude = findPreference(getString(R.string.settings_min_magnitude_key));
             Preference maxMagnitude = findPreference(getString(R.string.settings_max_magnitude_key));
             Preference orderBy = findPreference(getString(R.string.settings_order_by_key));
+            Preference startDate = findPreference("start_date");
+            Preference endDate = findPreference("end_date");
+
+            bindPreferenceSummaryToValue(startDate);
+            bindPreferenceSummaryToValue(endDate);
             bindPreferenceSummaryToValue(orderBy);
             bindPreferenceSummaryToValue(minMagnitude);
             bindPreferenceSummaryToValue(maxMagnitude);
@@ -51,8 +56,10 @@ public class SettingsActivity extends AppCompatActivity {
                     preference.setSummary(labels[prefIndex]);
                 }
             }
-            String strVal = value.toString();
-            preference.setSummary(strVal);
+            else{
+                preference.setSummary(stringValue);
+            }
+
             return true;
         }
 
