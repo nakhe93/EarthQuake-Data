@@ -129,6 +129,12 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderCallb
                 getString(R.string.settings_max_magnitude_key),
                 getString(R.string.settings_max_magnitude_default));
 
+        //Read the preference for arranging results in specific order
+        String orderBy = sharedPrefs.getString(
+                getString(R.string.settings_order_by_key),
+                getString(R.string.settings_order_by_default)
+        );
+
         //Base URL
         Uri baseUri = Uri.parse(USGS_REQUEST);
         Uri.Builder uriBuilder = baseUri.buildUpon();
@@ -140,7 +146,7 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderCallb
         //Build the URL using the min and max magnitude parameters specified in default value
         uriBuilder.appendQueryParameter("minmag", minMagnitude);
         uriBuilder.appendQueryParameter("maxmag", maxMagnitude);
-        //uriBuilder.appendQueryParameter("orderby", "time");
+        uriBuilder.appendQueryParameter("orderby", orderBy);
         Log.d("URL",uriBuilder.toString());
         return new EarthquakeLoader(this, uriBuilder.toString());
     }
