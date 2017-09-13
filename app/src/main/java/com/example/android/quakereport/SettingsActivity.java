@@ -36,6 +36,7 @@ public class SettingsActivity extends AppCompatActivity {
     public static class EarthquakePreferenceFragment extends PreferenceFragment implements Preference.OnPreferenceChangeListener,Preference.OnPreferenceClickListener{
 
         DateEditPreference endDate;
+        DateEditPreference startDate;
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.settings_main);
@@ -43,10 +44,11 @@ public class SettingsActivity extends AppCompatActivity {
             Preference minMagnitude = findPreference(getString(R.string.settings_min_magnitude_key));
             Preference maxMagnitude = findPreference(getString(R.string.settings_max_magnitude_key));
             Preference orderBy = findPreference(getString(R.string.settings_order_by_key));
-            Preference startDate = findPreference("start_date");
+            startDate = (DateEditPreference)findPreference("start_date");
             endDate = (DateEditPreference)findPreference("end_date");
 
             endDate.setOnPreferenceClickListener(this);
+            startDate.setOnPreferenceClickListener(this);
 
             bindPreferenceSummaryToValue(startDate);
             bindPreferenceSummaryToValue(endDate);
@@ -69,7 +71,6 @@ public class SettingsActivity extends AppCompatActivity {
             }
             else {
                 preference.setSummary(stringValue);
-                Log.d("endda",stringValue);
             }
             return true;
         }
@@ -80,8 +81,9 @@ public class SettingsActivity extends AppCompatActivity {
             int mDay = 0;
             int mMonth = 0;
             int mYear = 0;
-            int setDay;
+
             DateEditPreference end = (DateEditPreference) findPreference("end_date");
+            DateEditPreference start = (DateEditPreference) findPreference("start_date");
             if(preference == end) {
 
                 // Get Current Date
@@ -103,7 +105,39 @@ public class SettingsActivity extends AppCompatActivity {
                                 endDate.setSummary(year + "-" + (monthOfYear + 1) + "-" + dayOfMonth);
                                 endDate.setDefaultValue(endDate.getSummary().toString());
                                 Log.d("last",endDate.getSummary().toString());
-                                bindPreferenceSummaryToValueNew(endDate);
+                                bindPreferenceSummaryToValueDate(endDate);
+                                //int setYear = year;
+                                //int setMonth = monthOfYear + 1;
+                                //int setDay = dayOfMonth;
+
+
+
+                            }
+                        }, mYear, mMonth, mDay);
+                datePickerDialog.show();
+
+            }
+
+            if(preference == start) {
+
+                // Get Current Date
+                final Calendar c = Calendar.getInstance();
+                mYear = c.get(Calendar.YEAR);
+                mMonth = c.get(Calendar.MONTH);
+                mDay = c.get(Calendar.DAY_OF_MONTH);
+
+                DatePickerDialog datePickerDialog = new DatePickerDialog(v.getContext(),
+                        new DatePickerDialog.OnDateSetListener() {
+
+                            @Override
+                            public void onDateSet(DatePicker view, int year,
+                                                  int monthOfYear, int dayOfMonth) {
+
+                                //end.setText(year + "-" + (monthOfYear + 1) + "-" + dayOfMonth);
+                                startDate.setSummary(year + "-" + (monthOfYear + 1) + "-" + dayOfMonth);
+                                startDate.setDefaultValue(startDate.getSummary().toString());
+
+                                bindPreferenceSummaryToValueDate(startDate);
                                 //int setYear = year;
                                 //int setMonth = monthOfYear + 1;
                                 //int setDay = dayOfMonth;
@@ -127,7 +161,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         }
 
-        private void bindPreferenceSummaryToValueNew(Preference preference){
+        private void bindPreferenceSummaryToValueDate(Preference preference){
             preference.setOnPreferenceChangeListener(this);
 
             SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(preference.getContext());

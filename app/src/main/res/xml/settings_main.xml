@@ -24,17 +24,14 @@
         android:selectAllOnFocus="true"
         android:title="@string/settings_max_magnitude_label" />
 
-    <EditTextPreference
+    <com.example.android.quakereport.DateEditPreference
         android:defaultValue="2016-01-01"
-        android:inputType="text"
         android:key="start_date"
-        android:selectAllOnFocus="true"
         android:title="@string/start_date" />
 
     <com.example.android.quakereport.DateEditPreference
         android:defaultValue="2016-05-02"
         android:key="end_date"
-
         android:title="@string/end_date"
         />
 
