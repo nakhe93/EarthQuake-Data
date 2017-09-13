@@ -31,10 +31,13 @@
         android:selectAllOnFocus="true"
         android:title="@string/start_date" />
 
-    <EditTextPreference
+    <com.example.android.quakereport.DateEditPreference
         android:defaultValue="2016-05-02"
         android:key="end_date"
-        android:selectAllOnFocus="true"
-        android:title="@string/end_date" />
+
+        android:title="@string/end_date"
+        />
+
+
 
 </PreferenceScreen>

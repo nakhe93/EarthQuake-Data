@@ -16,6 +16,7 @@ import android.view.View;
 import android.widget.DatePicker;
 
 import java.util.Calendar;
+import java.util.Date;
 
 
 /**
@@ -33,8 +34,8 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     public static class EarthquakePreferenceFragment extends PreferenceFragment implements Preference.OnPreferenceChangeListener,Preference.OnPreferenceClickListener{
-        EditTextPreference end;
-        Preference endDate;
+
+        DateEditPreference endDate;
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.settings_main);
@@ -43,12 +44,12 @@ public class SettingsActivity extends AppCompatActivity {
             Preference maxMagnitude = findPreference(getString(R.string.settings_max_magnitude_key));
             Preference orderBy = findPreference(getString(R.string.settings_order_by_key));
             Preference startDate = findPreference("start_date");
-            endDate = findPreference("end_date");
+            endDate = (DateEditPreference)findPreference("end_date");
 
             endDate.setOnPreferenceClickListener(this);
 
             bindPreferenceSummaryToValue(startDate);
-
+            bindPreferenceSummaryToValue(endDate);
             bindPreferenceSummaryToValue(orderBy);
             bindPreferenceSummaryToValue(minMagnitude);
             bindPreferenceSummaryToValue(maxMagnitude);
@@ -68,6 +69,7 @@ public class SettingsActivity extends AppCompatActivity {
             }
             else {
                 preference.setSummary(stringValue);
+                Log.d("endda",stringValue);
             }
             return true;
         }
@@ -75,9 +77,11 @@ public class SettingsActivity extends AppCompatActivity {
 
         public boolean onPreferenceClick(Preference preference){
             View v = getView();
-            int mYear,mMonth,mDay;
+            int mDay = 0;
+            int mMonth = 0;
+            int mYear = 0;
             int setDay;
-            end = (EditTextPreference) findPreference("end_date");
+            DateEditPreference end = (DateEditPreference) findPreference("end_date");
             if(preference == end) {
 
                 // Get Current Date
@@ -85,8 +89,7 @@ public class SettingsActivity extends AppCompatActivity {
                 mYear = c.get(Calendar.YEAR);
                 mMonth = c.get(Calendar.MONTH);
                 mDay = c.get(Calendar.DAY_OF_MONTH);
-
-                Log.d("endddate","suceess");
+                
                 DatePickerDialog datePickerDialog = new DatePickerDialog(v.getContext(),
                         new DatePickerDialog.OnDateSetListener() {
 
@@ -94,13 +97,19 @@ public class SettingsActivity extends AppCompatActivity {
                             public void onDateSet(DatePicker view, int year,
                                                   int monthOfYear, int dayOfMonth) {
 
-                                Log.d("dateup","suceess");
-                                end.setText(year + "-" + (monthOfYear + 1) + "-" + dayOfMonth);
-                                int setYear = year;
-                                int setMonth = monthOfYear + 1;
-                                int setDay = dayOfMonth;
-                                Log.d("fin",String.valueOf(setDay));
-                                bindPreferenceSummaryToValue(endDate);
+
+                                Log.d("cal date",year + "-" + (monthOfYear + 1) + "-" + dayOfMonth);
+                                //end.setText(year + "-" + (monthOfYear + 1) + "-" + dayOfMonth);
+                                endDate.setSummary(year + "-" + (monthOfYear + 1) + "-" + dayOfMonth);
+                                endDate.setDefaultValue(endDate.getSummary().toString());
+                                Log.d("last",endDate.getSummary().toString());
+                                bindPreferenceSummaryToValueNew(endDate);
+                                //int setYear = year;
+                                //int setMonth = monthOfYear + 1;
+                                //int setDay = dayOfMonth;
+
+
+
                             }
                         }, mYear, mMonth, mDay);
                 datePickerDialog.show();
@@ -113,8 +122,32 @@ public class SettingsActivity extends AppCompatActivity {
             preference.setOnPreferenceChangeListener(this);
             SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(preference.getContext());
             String preferenceString = preferences.getString(preference.getKey(), "");
+
             onPreferenceChange(preference, preferenceString);
+
         }
+
+        private void bindPreferenceSummaryToValueNew(Preference preference){
+            preference.setOnPreferenceChangeListener(this);
+
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(preference.getContext());
+            //Log.d("before",preferences.getString(preference.getKey(), ""));
+
+            SharedPreferences.Editor editor = preferences.edit();
+
+            //Log.d("new",preferences.getString(preference.getKey(),""));
+            editor.putString(preference.getKey(),preference.getSummary().toString());
+            editor.apply();
+            editor.commit();
+
+            //Log.d("after",preferences.getString(preference.getKey(), ""));
+
+            //String preferenceString = preferences.getString(preference.getKey(), "");
+            onPreferenceChange(preference, preference.getSummary().toString());
+
+        }
+
+
     }
 }
 

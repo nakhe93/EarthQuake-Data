@@ -49,7 +49,7 @@ import java.util.List;
 
 public class EarthquakeActivity extends AppCompatActivity implements LoaderCallbacks<List<Earthquake>>{
 
-    public static final String USGS_REQUEST = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&starttime=2016-01-01&endtime=2016-05-02&minfelt=50";
+    public static final String USGS_REQUEST = "https://earthquake.usgs.gov/fdsnws/event/1/query?";
     public static final int EARTHQUAKE_LOADER_ID = 1;
     private EarthquakeAdapter adapter;
     private TextView emptyEarthquakeView;
@@ -119,6 +119,7 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderCallb
         adapter.clear();
 
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+
         //Read the preference corresponding to min_magnitude
         String minMagnitude = sharedPrefs.getString(
                 getString(R.string.settings_min_magnitude_key),
@@ -134,7 +135,8 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderCallb
 
         //Read the preference corresponding to end date
         String endDate = sharedPrefs.getString("end_date","2016-05-02");
-
+        Log.d("main",endDate);
+        Log.d("magm",maxMagnitude);
         //Read the preference for arranging results in specific order
         String orderBy = sharedPrefs.getString(
                 getString(R.string.settings_order_by_key),
